@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deposit</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>Deposit</h2>
+        <button id="logoutBtn" class="btn danger">Logout</button>
+      </div>
+      <div class="space"></div>
+      <div class="grid" style="grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); align-items: start;">
+        <div>
+          <div id="qrBox" class="qr">SCAN QR</div>
+          <p class="muted center">Scan and pay, then upload screenshot</p>
+        </div>
+        <div>
+          <div class="field">
+            <label for="screenshot">Upload Payment Screenshot</label>
+            <input id="screenshot" class="input" type="file" accept="image/*"/>
+          </div>
+          <div class="space"></div>
+          <button id="submitBtn" class="btn success">Submit Deposit</button>
+          <div id="msg" class="space"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="storage.js"></script>
+  <script>
+    const me = getSession();
+    if (!me || me.role !== 'user') {
+      window.location.href = '/login.html';
+    }
+    const qr = getQR();
+    if (qr) {
+      const box = document.getElementById('qrBox');
+      box.innerHTML = `<img src="${qr}" alt="QR">`;
+    }
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      setSession(null);
+      window.location.href = '/login.html';
+    });
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const file = document.getElementById('screenshot').files[0];
+      const msgEl = document.getElementById('msg');
+      msgEl.textContent = '';
+      if (!file) { msgEl.textContent = 'Please select a screenshot'; return; }
+      try {
+        const dataUrl = await fileToDataUrl(file);
+        const deposits = getDeposits();
+        deposits.push({
+          id: Date.now().toString(),
+          userMobile: me.mobile,
+          userName: me.name,
+          uploadedAt: new Date().toISOString(),
+          screenshotDataUrl: dataUrl
+        });
+        setDeposits(deposits);
+        msgEl.textContent = 'Submitted! Thank you.';
+      } catch (e) {
+        msgEl.textContent = 'Failed to submit';
+      }
+    });
+  </script>
+</body>
+</html>

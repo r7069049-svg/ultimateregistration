@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>Admin Panel</h2>
+        <button id="logoutBtn" class="btn danger">Logout</button>
+      </div>
+      <div class="space"></div>
+      <div id="content">
+        <p class="muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+  <script src="storage.js"></script>
+  <script>
+    const me = getSession();
+    if (!me || me.role !== 'owner') {
+      window.location.href = '/login.html';
+    }
+    function render() {
+      const qr = getQR();
+      const deposits = getDeposits();
+      const rows = deposits.map(d => `
+        <tr>
+          <td>${d.userName}</td>
+          <td>${d.userMobile}</td>
+          <td>${new Date(d.uploadedAt).toLocaleString()}</td>
+          <td><a class="btn" href="${d.screenshotDataUrl}" target="_blank">View</a></td>
+        </tr>
+      `).join('');
+      document.getElementById('content').innerHTML = `
+        <div class="grid">
+          <div class="field">
+            <label>Current QR</label>
+            <div class="qr">${qr ? `<img src="${qr}" alt="QR">` : 'No QR'}</div>
+          </div>
+          <div class="field">
+            <label>Upload New QR</label>
+            <input id="qrFile" class="input" type="file" accept="image/*"/>
+          </div>
+          <button id="saveQrBtn" class="btn success">Save QR</button>
+        </div>
+        <div class="space"></div>
+        <p><strong>Total Deposits:</strong> ${deposits.length}</p>
+        <table class="table">
+          <thead>
+            <tr><th>Name</th><th>Mobile</th><th>Time</th><th>Screenshot</th></tr>
+          </thead>
+          <tbody>
+            ${rows || '<tr><td colspan="4" class="center muted">No deposits yet</td></tr>'}
+          </tbody>
+        </table>
+      `;
+      const saveBtn = document.getElementById('saveQrBtn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', async () => {
+          const file = document.getElementById('qrFile').files[0];
+          if (!file) return;
+          const dataUrl = await fileToDataUrl(file);
+          setQR(dataUrl);
+          render();
+        });
+      }
+    }
+    render();
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      setSession(null);
+      window.location.href = '/login.html';
+    });
+  </script>
+</body>
+</html>

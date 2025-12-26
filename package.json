@@ -1,0 +1,17 @@
+{
+  "name": "ultimate-registration",
+  "version": "1.0.0",
+  "description": "Colorful attractive registration and deposit website with admin panel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "express-session": "^1.17.3",
+    "multer": "^1.4.5-lts.1"
+  }
+}

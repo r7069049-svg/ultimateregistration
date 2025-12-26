@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h2>Register</h2>
+      <div class="space"></div>
+      <div class="grid">
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" class="input" type="text" placeholder="Your name"/>
+        </div>
+        <div class="field">
+          <label for="mobile">Mobile Number</label>
+          <input id="mobile" class="input" type="tel" placeholder="e.g. 9876543210"/>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" class="input" type="password" placeholder="Choose a password"/>
+        </div>
+        <button id="registerBtn" class="btn success">Register</button>
+        <a class="btn" href="login.html">Already registered? Login</a>
+      </div>
+      <div id="msg" class="space"></div>
+    </div>
+  </div>
+  <script src="storage.js"></script>
+  <script>
+    const nameEl = document.getElementById('name');
+    const mobileEl = document.getElementById('mobile');
+    const passwordEl = document.getElementById('password');
+    const msgEl = document.getElementById('msg');
+    document.getElementById('registerBtn').addEventListener('click', async () => {
+      const name = nameEl.value.trim();
+      const mobile = mobileEl.value.trim();
+      const password = passwordEl.value;
+      msgEl.textContent = '';
+      if (!name || !mobile || !password) { msgEl.textContent = 'Please fill all fields'; return; }
+      if (mobile.length < 7) { msgEl.textContent = 'Invalid mobile number'; return; }
+      const users = getUsers();
+      if (users.find(u => u.mobile === mobile)) { msgEl.textContent = 'Mobile already registered'; return; }
+      users.push({ name, mobile, password, role: 'user' });
+      setUsers(users);
+      msgEl.textContent = 'Registered! Please login.';
+      setTimeout(() => { window.location.href = '/login.html'; }, 800);
+    });
+  </script>
+</body>
+</html>

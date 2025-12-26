@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h2>Login</h2>
+      <div class="space"></div>
+      <div class="grid">
+        <div class="field">
+          <label for="mobile">Mobile Number</label>
+          <input id="mobile" class="input" type="tel" placeholder="e.g. 9876543210"/>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" class="input" type="password" placeholder="Your password"/>
+        </div>
+        <button id="loginBtn" class="btn accent">Login</button>
+        <a class="btn" href="register.html">Register</a>
+      </div>
+      <div id="msg" class="space"></div>
+    </div>
+  </div>
+  <script src="storage.js"></script>
+  <script>
+    const mobileEl = document.getElementById('mobile');
+    const passwordEl = document.getElementById('password');
+    const msgEl = document.getElementById('msg');
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const mobile = mobileEl.value.trim();
+      const password = passwordEl.value;
+      msgEl.textContent = '';
+      const users = getUsers();
+      const user = users.find(u => u.mobile === mobile && u.password === password);
+      if (!user) { msgEl.textContent = 'Invalid mobile or password'; return; }
+      setSession(user);
+      if (user.role === 'owner') {
+        window.location.href = '/admin.html';
+      } else {
+        window.location.href = '/user.html';
+      }
+    });
+  </script>
+</body>
+</html>
